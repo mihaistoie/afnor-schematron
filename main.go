@@ -119,8 +119,8 @@ func buildClasspath() (string, error) {
 	}
 	if saxonJar == "" {
 		return "", fmt.Errorf(
-			"Saxon JAR nu a fost găsit. " +
-				"Plasați saxon-he-*.jar în directorul curent sau setați variabila SAXON_JAR.")
+			"Saxon JAR introuvable. " +
+				"Placez saxon-he-*.jar dans le répertoire courant ou définissez la variable SAXON_JAR.")
 	}
 
 	// Collect all JARs in the same directory as saxon (deps like xmlresolver)
