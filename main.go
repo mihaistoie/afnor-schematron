@@ -169,6 +169,10 @@ func runSaxon(xmlData []byte, xslPath string) (string, error) {
 	runErr := cmd.Run()
 	output := stdout.String()
 
+	if stderr.Len() > 0 {
+		fmt.Fprintf(os.Stderr, "[DEBUG Saxon stderr]: %s\n", stderr.String())
+	}
+
 	if output == "" && runErr != nil {
 		return "", fmt.Errorf("Saxon error: %s", strings.TrimSpace(stderr.String()))
 	}
