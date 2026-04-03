@@ -306,7 +306,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "3001"
 	}
 	addr := ":" + port
 	fmt.Printf("Serveur démarré sur http://localhost%s\n", addr)

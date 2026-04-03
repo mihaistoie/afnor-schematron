@@ -54,7 +54,7 @@ go build -o validator.exe .
 ## Usage
 
 ```bash
-# Start the server (default port: 3000)
+# Start the server (default port: 3001)
 ./validator.exe
 ```
 
