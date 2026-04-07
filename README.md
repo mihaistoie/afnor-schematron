@@ -58,7 +58,7 @@ go build -o validator.exe .
 ./validator.exe
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+Then open [http://localhost:3001](http://localhost:3001) in your browser.
 
 1. Select an XML file to validate
 2. Choose the validation type
