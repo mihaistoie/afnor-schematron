@@ -117,7 +117,7 @@
                  as="xs:boolean">
       <xsl:param name="code" as="xs:string?"/>
       <xsl:variable name="validCodes"
-                    select="(       'RIB', 'LISIBLE', 'FEUILLE_DE_STYLE', 'PJA', 'BORDEREAU_SUIVI',       'DOCUMENT_ANNEXE', 'BON_LIVRAISON', 'BON_COMMANDE',       'BORDEREAU_SUIVI_VALIDATION', 'ETAT_ACOMPTE', 'FACTURE_PAIEMENT_DIRECT'       )"/>
+                    select="(       'RIB', 'LISIBLE', 'FEUILLE_DE_STYLE', 'PJA', 'BORDEREAU_SUIVI',       'DOCUMENT_ANNEXE', 'BON_LIVRAISON', 'BON_COMMANDE',       'BORDEREAU_SUIVI_VALIDATION', 'ETAT_ACOMPTE', 'FACTURE_PAIEMENT_DIRECT', 'RECAPITULATIF_COTRAITANCE'       )"/>
       <xsl:sequence select="$code = $validCodes"/>
    </xsl:function>
    <xsl:function xmlns="http://purl.oclc.org/dsdl/schematron"
@@ -126,7 +126,7 @@
       <xsl:param name="value" as="xs:string?"/>
       <!-- Autorise lettres, chiffres, + - _ / sans espaces -->
       <!-- CYS4 il faut supprimer le + -->
-      <xsl:sequence select="matches($value, '^[A-Za-z0-9+\-_/]+$')"/>
+      <xsl:sequence select="matches($value, '^[A-Za-z0-9+\-_.]+$')"/>
    </xsl:function>
    <xsl:function xmlns="http://purl.oclc.org/dsdl/schematron"
                  name="custom:is-valid-decimal-19-2"
@@ -995,11 +995,11 @@
       <xsl:apply-templates select="*" mode="M22"/>
    </xsl:template>
    <!--RULE -->
-   <xsl:template match="ubl:Invoice/cac:InvoiceLine/cac:DocumentReference/cbc:ID | cn:CreditNote/cac:CreditNoteLine/cac:DocumentReference/cbc:ID"
+   <xsl:template match="ubl:Invoice/cac:InvoiceLine/cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID | cn:CreditNote/cac:CreditNoteLine/cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID"
                  priority="1000"
                  mode="M22">
       <svrl:fired-rule xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                       context="ubl:Invoice/cac:InvoiceLine/cac:DocumentReference/cbc:ID | cn:CreditNote/cac:CreditNoteLine/cac:DocumentReference/cbc:ID"/>
+                       context="ubl:Invoice/cac:InvoiceLine/cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID | cn:CreditNote/cac:CreditNoteLine/cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID"/>
       <!--ASSERT -->
       <xsl:choose>
          <xsl:when test="custom:is-valid-id-format(.)"/>
@@ -3768,7 +3768,8 @@
       <xsl:variable name="grandTotal"
                     select="cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount"/>
       <xsl:variable name="payableAmount" select="cac:LegalMonetaryTotal/cbc:PayableAmount"/>
-      <xsl:variable name="dueDate" select="cbc:DueDate"/>
+      <xsl:variable name="dueDate"
+                    select=" if (self::ubl:Invoice)          then cbc:DueDate         else if (self::cn:CreditNote)         then cac:PaymentMeans/cbc:PaymentDueDate         else ()"/>
       <!--ASSERT -->
       <xsl:choose>
          <xsl:when test="not($billingContext = 'B2' or $billingContext = 'S2' or $billingContext = 'M2') or (number($paidAmount) = number($grandTotal))"/>
@@ -5137,11 +5138,11 @@
    <xsl:variable name="invoiceID" select="(ubl:Invoice|/cn:CreditNote)/cbc:ID"/>
    <svrl:text xmlns:svrl="http://purl.oclc.org/dsdl/svrl">BR-FR-MV-01 — lorsque le cadre de facturation est S8, B8 ou M8, Vérification du sous-type de ligne  - BR-FR-MV-02 — Vérification de la présence d'une ligne GROUP sans parent </svrl:text>
    <!--RULE -->
-   <xsl:template match="(cac:InvoiceLine|cac:CreditNoteLine)"
+   <xsl:template match="cac:InvoiceLine|cac:CreditNoteLine"
                  priority="1000"
                  mode="M63">
       <svrl:fired-rule xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                       context="(cac:InvoiceLine|cac:CreditNoteLine)"/>
+                       context="cac:InvoiceLine|cac:CreditNoteLine"/>
       <!--ASSERT -->
       <xsl:choose>
          <xsl:when test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote)) or (exists(cac:BillingReference[cac:InvoiceDocumentReference/cbc:ID = $invoiceID]) and (normalize-space(cac:BillingReference[cac:InvoiceDocumentReference/cbc:ID = $invoiceID]/cac:InvoiceDocumentReference/cbc:DocumentStatusCode) != ''))"/>
@@ -5177,9 +5178,9 @@
    <!--PATTERN BR-FR-MV-02BR-FR-MV-02 — lorsque le cadre de facturation est S8, B8 ou M8, Vérification de la présence d'une ligne GROUP sans parent -->
    <svrl:text xmlns:svrl="http://purl.oclc.org/dsdl/svrl">BR-FR-MV-02 — lorsque le cadre de facturation est S8, B8 ou M8, Vérification de la présence d'une ligne GROUP sans parent </svrl:text>
    <!--RULE -->
-   <xsl:template match="(ubl:Invoice|/cn:CreditNote)" priority="1000" mode="M64">
+   <xsl:template match="ubl:Invoice|/cn:CreditNote" priority="1000" mode="M64">
       <svrl:fired-rule xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                       context="(ubl:Invoice|/cn:CreditNote)"/>
+                       context="ubl:Invoice|/cn:CreditNote"/>
       <!--ASSERT -->
       <xsl:choose>
          <xsl:when test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote))          or (count((cac:InvoiceLine|cac:CreditNoteLine)/cac:BillingReference[(cac:InvoiceDocumentReference/cbc:ID = $invoiceID) and (cac:InvoiceDocumentReference/cbc:DocumentStatusCode = 'GROUP') and not(cac:BillingReferenceLine/cbc:ID)]) &gt;= 1)"/>
@@ -5425,11 +5426,11 @@
    <!--PATTERN BR-FR-MV-06BR-FR-MV-06 — Vérification de la cohérence de l'identifiant légal du vendeur entre une ligne et sa ligne parent-->
    <svrl:text xmlns:svrl="http://purl.oclc.org/dsdl/svrl">BR-FR-MV-06 — Vérification de la cohérence de l'identifiant légal du vendeur entre une ligne et sa ligne parent</svrl:text>
    <!--RULE -->
-   <xsl:template match="(ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine)"
+   <xsl:template match="ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine"
                  priority="1000"
                  mode="M67">
       <svrl:fired-rule xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                       context="(ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine)"/>
+                       context="ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine"/>
       <xsl:variable name="parentlineID"
                     select="cac:BillingReference[cac:InvoiceDocumentReference/cbc:ID = $invoiceID]/cac:BillingReferenceLine/cbc:ID"/>
       <xsl:variable name="legalID"
@@ -5471,11 +5472,11 @@
    <!--PATTERN BR-FR-MV-07BR-FR-MV-07 — Vérification de la cohérence du numéro de facture codifié AFL entre une ligne et sa ligne parent-->
    <svrl:text xmlns:svrl="http://purl.oclc.org/dsdl/svrl">BR-FR-MV-07 — Vérification de la cohérence du numéro de facture codifié AFL entre une ligne et sa ligne parent</svrl:text>
    <!--RULE -->
-   <xsl:template match="(ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine)"
+   <xsl:template match="ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine"
                  priority="1000"
                  mode="M68">
       <svrl:fired-rule xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                       context="(ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine)"/>
+                       context="ubl:Invoice/cac:InvoiceLine|cn:CreditNote/cac:CreditNoteLine"/>
       <xsl:variable name="parentlineID"
                     select="cac:BillingReference[cac:InvoiceDocumentReference/cbc:ID = $invoiceID]/cac:BillingReferenceLine/cbc:ID"/>
       <xsl:variable name="numfact"
@@ -5568,10 +5569,10 @@
       <xsl:variable name="invcurrency" select="../../cbc:DocumentCurrencyCode"/>
       <!--ASSERT -->
       <xsl:choose>
-         <xsl:when test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote))          or (abs(number(../cac:TaxTotal/cbc:TaxAmount[@currencyID = $invcurrency]) - $sumvat) &lt;= 0.00)"/>
+         <xsl:when test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote))          or (abs(number(../cac:TaxTotal/cbc:TaxAmount[@currencyID = $invcurrency]) - $sumvat) &lt;= 0.01)"/>
          <xsl:otherwise>
             <svrl:failed-assert xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                                test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote)) or (abs(number(../cac:TaxTotal/cbc:TaxAmount[@currencyID = $invcurrency]) - $sumvat) &lt;= 0.00)">
+                                test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote)) or (abs(number(../cac:TaxTotal/cbc:TaxAmount[@currencyID = $invcurrency]) - $sumvat) &lt;= 0.01)">
                <xsl:attribute name="id">BR-FR-MV-09_EXT-FR-FE-181</xsl:attribute>
                <xsl:attribute name="flag">fatal</xsl:attribute>
                <xsl:attribute name="location">
@@ -5695,9 +5696,9 @@
    <!--PATTERN BR-FR-MV-12BR-FR-MV-12 — Vérification de l'unicité des numéros de facture AFL pour les lignes GROUP sans parent-->
    <svrl:text xmlns:svrl="http://purl.oclc.org/dsdl/svrl">BR-FR-MV-12 — Vérification de l'unicité des numéros de facture AFL pour les lignes GROUP sans parent</svrl:text>
    <!--RULE -->
-   <xsl:template match="(ubl:Invoice|/cn:CreditNote)" priority="1000" mode="M73">
+   <xsl:template match="ubl:Invoice|/cn:CreditNote" priority="1000" mode="M73">
       <svrl:fired-rule xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                       context="(ubl:Invoice|/cn:CreditNote)"/>
+                       context="ubl:Invoice|/cn:CreditNote"/>
       <!--ASSERT -->
       <xsl:choose>
          <xsl:when test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote))          or not((cac:InvoiceLine|cac:CreditNoteLine)[cac:BillingReference[cac:InvoiceDocumentReference/cbc:ID = $invoiceID][(cac:InvoiceDocumentReference/cbc:DocumentStatusCode = 'GROUP') and not(cac:BillingReferenceLine/cbc:ID)]]/cac:DocumentReference[cbc:DocumentTypeCode = '130']/cbc:ID[@schemeID = 'AFL'][. = preceding::cac:DocumentReference[cbc:DocumentTypeCode = '130']/cbc:ID[@schemeID = 'AFL']])"/>
@@ -5724,11 +5725,11 @@
    <!--PATTERN BR-FR-MV-13BR-FR-MV-13 — Vérification que le code type de facture (BT-3) n'est pas un type auto-facturé interdit-->
    <svrl:text xmlns:svrl="http://purl.oclc.org/dsdl/svrl">BR-FR-MV-13 — Vérification que le code type de facture (BT-3) n'est pas un type auto-facturé interdit</svrl:text>
    <!--RULE -->
-   <xsl:template match="(ubl:Invoice/cbc:InvoiceTypeCode|/cn:CreditNote/cbc:CreditNoteTypeCode)"
+   <xsl:template match="ubl:Invoice/cbc:InvoiceTypeCode|/cn:CreditNote/cbc:CreditNoteTypeCode"
                  priority="1000"
                  mode="M74">
       <svrl:fired-rule xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
-                       context="(ubl:Invoice/cbc:InvoiceTypeCode|/cn:CreditNote/cbc:CreditNoteTypeCode)"/>
+                       context="ubl:Invoice/cbc:InvoiceTypeCode|/cn:CreditNote/cbc:CreditNoteTypeCode"/>
       <!--ASSERT -->
       <xsl:choose>
          <xsl:when test="not(custom:isSpecialContract(/ubl:Invoice|/cn:CreditNote))          or (normalize-space(.) != ''          and not(. = '389' or . = '261' or . = '501' or . = '500' or . = '502' or . = '471' or . = '473'))"/>

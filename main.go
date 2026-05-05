@@ -26,16 +26,16 @@ type ValidationOption struct {
 var validationOptions = []ValidationOption{
 	{
 		ID:    "EXTENDED-CTC-FR-UBL",
-		Label: "EXTENDED-CTC-FR-UBL V1.3 (complet — deux validations)",
+		Label: "EXTENDED-CTC-FR-UBL V1.3.1 (complet — deux validations)",
 		XSLs: []string{
-			"data/ubl/EXTENDED-CTC-FR-UBL-V1.3.0.xsl",
-			"data/ubl/BR-FR-Flux2-Schematron-UBL_V1.3.0.xsl",
+			"data/ubl/EXTENDED-CTC-FR-UBL-V1.3.1.xsl",
+			"data/ubl/BR-FR-Flux2-Schematron-UBL_V1.3.1.xsl",
 		},
 	},
 	{
 		ID:    "EXTENDED-CTC-FR-CDAR",
-		Label: "EXTENDED-CTC-FR-CDAR V1.3.0",
-		XSLs:  []string{"data/cdar/BR-FR-CDV-Schematron-CDAR_V1.3.0.xsl"},
+		Label: "EXTENDED-CTC-FR-CDAR V1.3.1",
+		XSLs:  []string{"data/cdar/BR-FR-CDV-Schematron-CDAR_V1.3.1.xsl"},
 	},
 }
 

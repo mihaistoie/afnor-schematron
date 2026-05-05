@@ -58,7 +58,7 @@ go build -o validator.exe .
 ./validator.exe
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+Then open [http://localhost:3001](http://localhost:3001) in your browser.
 
 1. Select an XML file to validate
 2. Choose the validation type
@@ -83,7 +83,7 @@ PORT=8080 ./validator.exe
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PORT` | `3000` | TCP port the HTTP server listens on |
+| `PORT` | `3001` | TCP port the HTTP server listens on |
 
 ### Saxon JAR path
 
