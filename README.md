@@ -9,8 +9,8 @@ Built with Go and Saxon-HE, it runs XSLT/Schematron validations and reports erro
 
 | ID | Description |
 |----|-------------|
-| `EXTENDED-CTC-FR-UBL` | EXTENDED-CTC-FR-UBL V1.3.1 — two-pass validation (EXTENDED + BR-FR-Flux2) |
-| `EXTENDED-CTC-FR-CDAR` | EXTENDED-CTC-FR-CDAR V1.3.1 — single-pass validation |
+| `EXTENDED-CTC-FR-UBL` | EXTENDED-CTC-FR-UBL — two-pass validation (EXTENDED + BR-FR-Flux2) |
+| `EXTENDED-CTC-FR-CDAR` | EXTENDED-CTC-FR-CDAR — single-pass validation |
 
 ---
 
@@ -115,10 +115,10 @@ afnor-schematron/
 ├── xmlresolver-6.0.9.jar           # XML Resolver (versioned)
 ├── data/
 │   ├── ubl/
-│   │   ├── EXTENDED-CTC-FR-UBL-V1.3.1.xsl
-│   │   ├── BR-FR-Flux2-Schematron-UBL_V1.3.1.xsl
+│   │   ├── EXTENDED-CTC-FR-UBL.xsl
+│   │   ├── BR-FR-Flux2-Schematron-UBL.xsl
 │   └── cdar/
-│       └── BR-FR-CDV-Schematron-CDAR_V1.3.1.xsl
+│       └── BR-FR-CDV-Schematron-CDAR.xsl
 └── .gitignore
 ```
 

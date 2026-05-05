@@ -26,16 +26,16 @@ type ValidationOption struct {
 var validationOptions = []ValidationOption{
 	{
 		ID:    "EXTENDED-CTC-FR-UBL",
-		Label: "EXTENDED-CTC-FR-UBL V1.3.1 (complet — deux validations)",
+		Label: "EXTENDED-CTC-FR-UBL (complet — deux validations)",
 		XSLs: []string{
-			"data/ubl/EXTENDED-CTC-FR-UBL-V1.3.1.xsl",
-			"data/ubl/BR-FR-Flux2-Schematron-UBL_V1.3.1.xsl",
+			"data/ubl/EXTENDED-CTC-FR-UBL.xsl",
+			"data/ubl/BR-FR-Flux2-Schematron-UBL.xsl",
 		},
 	},
 	{
 		ID:    "EXTENDED-CTC-FR-CDAR",
-		Label: "EXTENDED-CTC-FR-CDAR V1.3.1",
-		XSLs:  []string{"data/cdar/BR-FR-CDV-Schematron-CDAR_V1.3.1.xsl"},
+		Label: "EXTENDED-CTC-FR-CDAR",
+		XSLs:  []string{"data/cdar/BR-FR-CDV-Schematron-CDAR.xsl"},
 	},
 }
 
@@ -226,13 +226,15 @@ type PageData struct {
 	SelectedID string
 	FileName   string
 	Result     *ValidationResult
+	Version    string
 }
 
-func handleIndex(tmpl *template.Template) http.HandlerFunc {
+func handleIndex(tmpl *template.Template, version string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := PageData{
 			Options:    validationOptions,
 			SelectedID: validationOptions[0].ID,
+			Version:    version,
 		}
 
 		if r.Method == http.MethodPost {
@@ -305,8 +307,14 @@ func handleIndex(tmpl *template.Template) http.HandlerFunc {
 // ---------------------------------------------------------------------------
 
 func main() {
+	versionBytes, err := os.ReadFile("data/version.txt")
+	version := "?"
+	if err == nil {
+		version = strings.TrimSpace(string(versionBytes))
+	}
+
 	tmpl := template.Must(template.New("page").Parse(htmlPage))
-	http.HandleFunc("/", handleIndex(tmpl))
+	http.HandleFunc("/", handleIndex(tmpl, version))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -329,7 +337,7 @@ const htmlPage = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Validation XML – AFNOR Schematron</title>
+<title>Validation XML – AFNOR Schematron V{{.Version}}</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   body { font-family: Segoe UI, Arial, sans-serif; margin: 0; background: #f0f2f5; color: #222; }
@@ -376,7 +384,7 @@ const htmlPage = `<!DOCTYPE html>
 </style>
 </head>
 <body>
-<header><h1>Validation XML – AFNOR Schematron UBL</h1></header>
+<header><h1>Validation XML – AFNOR Schematron UBL V{{.Version}}</h1></header>
 <main>
 
   <div class="card">
