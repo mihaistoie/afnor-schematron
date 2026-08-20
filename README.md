@@ -11,6 +11,7 @@ Built with Go and Saxon-HE, it runs XSLT/Schematron validations and reports erro
 |----|-------------|
 | `EXTENDED-CTC-FR-UBL` | EXTENDED-CTC-FR-UBL — two-pass validation (EXTENDED + BR-FR-Flux2) |
 | `EXTENDED-CTC-FR-CDAR` | EXTENDED-CTC-FR-CDAR — single-pass validation |
+| `EREPORTING` | PPF Flux10 e-reporting — single-pass validation |
 
 ---
 
@@ -117,8 +118,11 @@ afnor-schematron/
 │   ├── ubl/
 │   │   ├── EXTENDED-CTC-FR-UBL.xsl
 │   │   ├── BR-FR-Flux2-Schematron-UBL.xsl
+│   ├── flux10/
+│   │   └── AIFE - PPF_Flux10_v1.0.sch
 │   └── cdar/
-│       └── BR-FR-CDV-Schematron-CDAR.xsl
+│       ├── BR-FR-CDV-Schematron-CDAR.xsl
+│       └── EREPORTING.xsl
 └── .gitignore
 ```
 

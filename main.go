@@ -37,6 +37,11 @@ var validationOptions = []ValidationOption{
 		Label: "EXTENDED-CTC-FR-CDAR",
 		XSLs:  []string{"data/cdar/BR-FR-CDV-Schematron-CDAR.xsl"},
 	},
+	{
+		ID:    "EREPORTING",
+		Label: "EREPORTING",
+		XSLs:  []string{"data/flux10/EREPORTING.xsl"},
+	},
 }
 
 // ---------------------------------------------------------------------------
